@@ -1,0 +1,100 @@
+apiVersion: "apps/v1beta2"
+kind: "StatefulSet"
+metadata:
+  name: "sqlserverlinux-dev"
+  namespace: "jx"
+  labels:
+    app: "sqlserverlinux"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "sqlserverlinux"
+  servicename: "sqlserverlinux-dev"
+  template:
+    metadata:
+      labels:
+        app: "sqlserverlinux-dev"
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: "sqlserverlinux-dev"
+          image: "eu.gcr.io/hs-it-pega-sandbox/sqlsvr1"
+          securityContext:
+            runAsUser: 0
+          ports:
+            - containerPort: 1433
+          env:
+            - name: "ACCEPT_EULA"
+              value: "Y"
+            - name: "SA_PASSWORD"
+              value: "Bigp0nts"
+          volumeMounts:
+            - mountPath: "/var/opt/mssql"
+              name: "sqlserverlinux-dev-v"
+      volumes:
+          - name: "sqlserverlinux-dev-v"
+            persistentVolumeClaim:
+              claimName: "sql-pvc"        
+---
+kind: "StorageClass"
+apiVersion: "storage.k8s.io/v1"
+metadata:
+  name: "faster"
+  namespace: "jx"
+provisioner: "kubernetes.io/gce-pd"
+parameters:
+  type: "pd-ssd"
+  zone: "europe-west1-b"
+---  
+apiVersion: v1
+kind: "PersistentVolumeClaim"
+metadata:
+  name: "sql-pvc"
+  namespace: "jx"
+  labels:
+    name: "sqlserverlinux-dev"
+  annotations:
+    volume.alpha.kubernetes.io/storage-class: "faster"
+spec:
+  storageClassName: "faster"
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: "100Gi"
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "sqlserverlinux-dev-service"
+  namespace: "jx"
+  labels:
+    app: "sqlserverlinux"
+spec:
+  ports:
+  - name: "1433-to-1433-tcp"
+    protocol: "TCP"
+    port: 1433
+    targetPort: 1433
+  selector:
+    app: "sqlserverlinux-dev"
+  type: "LoadBalancer"
+  loadBalancerIP: ""
+---
+apiVersion: "autoscaling/v1"
+kind: "HorizontalPodAutoscaler"
+metadata:
+  name: "sqlserverlinux-hpa"
+  namespace: "jx"
+  labels:
+    app: "sqlserverlinux-dev"
+spec:
+  scaleTargetRef:
+    kind: "Deployment"
+    name: "sqlserverlinux-dev"
+    apiVersion: "apps/v1beta1"
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+
+      

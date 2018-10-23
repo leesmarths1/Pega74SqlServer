@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       app: "sqlserverlinux"
-  servicename: "sqlserverlinux"
+  servicename: "sqlserverlinux-service"
   template:
     metadata:
       labels:

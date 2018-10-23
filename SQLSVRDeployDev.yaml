@@ -1,7 +1,7 @@
 apiVersion: "apps/v1beta2"
 kind: "StatefulSet"
 metadata:
-  name: "sqlserverlinux"
+  name: "sqlserverlinux-dev"
   namespace: "Default"
   labels:
     app: "sqlserverlinux"
@@ -10,15 +10,15 @@ spec:
   selector:
     matchLabels:
       app: "sqlserverlinux"
-  servicename: "sqlserverlinux"
+  servicename: "sqlserverlinux-dev"
   template:
     metadata:
       labels:
-        app: "sqlserverlinux"
+        app: "sqlserverlinux-dev"
     spec:
       terminationGracePeriodSeconds: 10
       containers:
-        - name: "sqlserverlinux"
+        - name: "sqlserverlinux-dev"
           image: "eu.gcr.io/hs-it-pega-sandbox/sqlsvr1"
           securityContext:
             runAsUser: 0
@@ -31,9 +31,9 @@ spec:
               value: "Bigp0nts"
           volumeMounts:
             - mountPath: "/var/opt/mssql"
-              name: "sqlserverlinux-v"
+              name: "sqlserverlinux-dev-v"
       volumes:
-          - name: "sqlserverlinux-v"
+          - name: "sqlserverlinux-dev-v"
             persistentVolumeClaim:
               claimName: "sql-pvc"        
 ---
@@ -53,7 +53,7 @@ metadata:
   name: "sql-pvc"
   namespace: "Default"
   labels:
-    name: "sqlserverlinux"
+    name: "sqlserverlinux-dev"
   annotations:
     volume.alpha.kubernetes.io/storage-class: "faster"
 spec:
@@ -66,7 +66,7 @@ spec:
 apiVersion: "v1"
 kind: "Service"
 metadata:
-  name: "sqlserverlinux-service"
+  name: "sqlserverlinux-dev-service"
   namespace: "Default"
   labels:
     app: "sqlserverlinux"
@@ -77,7 +77,7 @@ spec:
     port: 1433
     targetPort: 1433
   selector:
-    app: "sqlserverlinux"
+    app: "sqlserverlinux-dev"
   type: "LoadBalancer"
   loadBalancerIP: ""
 ---
@@ -87,11 +87,11 @@ metadata:
   name: "sqlserverlinux-hpa"
   namespace: "Default"
   labels:
-    app: "sqlserverlinux"
+    app: "sqlserverlinux-dev"
 spec:
   scaleTargetRef:
-    kind: "Deployment"
-    name: "sqlserverlinux"
+    kind: "StatefulSet"
+    name: "sqlserverlinux-dev"
     apiVersion: "apps/v1beta1"
   minReplicas: 1
   maxReplicas: 5

@@ -18,7 +18,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 10
       containers:
-        - name: "sqlserverlinux-dev"
+        - name: "sqlserverlinux"
           image: "eu.gcr.io/hs-it-pega-sandbox/sqlsvr1"
           securityContext:
             runAsUser: 0

@@ -10,11 +10,11 @@ spec:
   selector:
     matchLabels:
       app: "sqlserverlinux"
-  servicename: "sqlserverlinux-dev"
+  servicename: "sqlserverlinux"
   template:
     metadata:
       labels:
-        app: "sqlserverlinux-dev"
+        app: "sqlserverlinux"
     spec:
       terminationGracePeriodSeconds: 10
       containers:
@@ -31,9 +31,9 @@ spec:
               value: "Bigp0nts"
           volumeMounts:
             - mountPath: "/var/opt/mssql"
-              name: "sqlserverlinux-dev-v"
+              name: "sqlserverlinux-v"
       volumes:
-          - name: "sqlserverlinux-dev-v"
+          - name: "sqlserverlinux-v"
             persistentVolumeClaim:
               claimName: "sql-pvc"        
 ---
@@ -53,7 +53,7 @@ metadata:
   name: "sql-pvc"
   #namespace: "jx"
   labels:
-    name: "sqlserverlinux-dev"
+    name: "sqlserverlinux"
   annotations:
     volume.alpha.kubernetes.io/storage-class: "faster"
 spec:
@@ -66,7 +66,7 @@ spec:
 apiVersion: "v1"
 kind: "Service"
 metadata:
-  name: "sqlserverlinux-dev-service"
+  name: "sqlserverlinux-service"
   #namespace: "jx"
   labels:
     app: "sqlserverlinux"
@@ -77,7 +77,7 @@ spec:
     port: 1433
     targetPort: 1433
   selector:
-    app: "sqlserverlinux-dev"
+    app: "sqlserverlinux"
   type: "LoadBalancer"
   loadBalancerIP: ""
 ---
@@ -87,11 +87,11 @@ metadata:
   name: "sqlserverlinux-hpa"
   #namespace: "jx"
   labels:
-    app: "sqlserverlinux-dev"
+    app: "sqlserverlinux"
 spec:
   scaleTargetRef:
     kind: "Deployment"
-    name: "sqlserverlinux-dev"
+    name: "sqlserverlinux"
     apiVersion: "apps/v1beta1"
   minReplicas: 1
   maxReplicas: 5

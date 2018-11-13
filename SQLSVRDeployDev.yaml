@@ -1,24 +1,31 @@
+kind: "Namespace"
+apiVersion: "v1"
+metadata:
+  name: "pega74"
+  labels: 
+    name: "pega74"
+---
 apiVersion: "apps/v1beta2"
 kind: "StatefulSet"
 metadata:
-  name: "sqlserverlinux-dev"
-  namespace: "Default"
+  name: "sql-pega74"
+  namespace: "pega74"
   labels:
-    app: "sqlserverlinux"
+    app: "sql-pega74"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: "sqlserverlinux"
-  servicename: "sqlserverlinux-dev"
+      app: "sql-pega74"
+  serviceName: "sql-pega74"
   template:
     metadata:
       labels:
-        app: "sqlserverlinux-dev"
+        app: "sql-pega74"
     spec:
       terminationGracePeriodSeconds: 10
       containers:
-        - name: "sqlserverlinux-dev"
+        - name: "sql-pega74"
           image: "eu.gcr.io/hs-it-pega-sandbox/sqlsvr1"
           securityContext:
             runAsUser: 0
@@ -31,17 +38,17 @@ spec:
               value: "Bigp0nts"
           volumeMounts:
             - mountPath: "/var/opt/mssql"
-              name: "sqlserverlinux-dev-v"
+              name: "sql-pega74-v"
       volumes:
-          - name: "sqlserverlinux-dev-v"
+          - name: "sql-pega74-v"
             persistentVolumeClaim:
-              claimName: "sql-pvc"        
+              claimName: "sql-pega74-pvc"        
 ---
 kind: "StorageClass"
 apiVersion: "storage.k8s.io/v1"
 metadata:
   name: "faster"
-  namespace: "Default"
+  namespace: "pega74"
 provisioner: "kubernetes.io/gce-pd"
 parameters:
   type: "pd-ssd"
@@ -50,10 +57,10 @@ parameters:
 apiVersion: v1
 kind: "PersistentVolumeClaim"
 metadata:
-  name: "sql-pvc"
-  namespace: "Default"
+  name: "sql-pega74-pvc"
+  namespace: "pega74"
   labels:
-    name: "sqlserverlinux-dev"
+    name: "sql-pega74"
   annotations:
     volume.alpha.kubernetes.io/storage-class: "faster"
 spec:
@@ -66,10 +73,10 @@ spec:
 apiVersion: "v1"
 kind: "Service"
 metadata:
-  name: "sqlserverlinux-dev-service"
-  namespace: "Default"
+  name: "sql-pega74-service"
+  namespace: "pega74"
   labels:
-    app: "sqlserverlinux"
+    app: "sql-pega74"
 spec:
   ports:
   - name: "1433-to-1433-tcp"
@@ -77,21 +84,21 @@ spec:
     port: 1433
     targetPort: 1433
   selector:
-    app: "sqlserverlinux-dev"
+    app: "sql-pega74"
   type: "LoadBalancer"
   loadBalancerIP: ""
 ---
 apiVersion: "autoscaling/v1"
 kind: "HorizontalPodAutoscaler"
 metadata:
-  name: "sqlserverlinux-hpa"
-  namespace: "Default"
+  name: "sql-pega74-hpa"
+  namespace: "pega74"
   labels:
-    app: "sqlserverlinux-dev"
+    app: "sql-pega74"
 spec:
   scaleTargetRef:
     kind: "StatefulSet"
-    name: "sqlserverlinux-dev"
+    name: "sql-pega74"
     apiVersion: "apps/v1beta1"
   minReplicas: 1
   maxReplicas: 5

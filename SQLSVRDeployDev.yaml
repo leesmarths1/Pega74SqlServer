@@ -17,7 +17,7 @@ spec:
   selector:
     matchLabels:
       app: "sql-pega74"
-  serviceName: "sql-pega74-service"
+  serviceName: "sql-pega74"
   template:
     metadata:
       labels:

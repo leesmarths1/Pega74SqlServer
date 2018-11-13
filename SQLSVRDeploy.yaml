@@ -6,7 +6,8 @@ metadata:
     name: "pega74"
 ---
 apiVersion: "apps/v1beta2"
-kind: "StatefulSet"metadata:
+kind: "StatefulSet"
+metadata:
   name: "sql-pega74"
   namespace: "pega74"
   labels:
@@ -102,7 +103,5 @@ spec:
   minReplicas: 1
   maxReplicas: 5
   targetCPUUtilizationPercentage: 80
-
-  
 
       

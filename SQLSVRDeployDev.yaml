@@ -1,3 +1,4 @@
+
 kind: "Namespace"
 apiVersion: "v1"
 metadata:
@@ -6,8 +7,7 @@ metadata:
     name: "pega74"
 ---
 apiVersion: "apps/v1beta2"
-kind: "StatefulSet"
-metadata:
+kind: "StatefulSet"metadata:
   name: "sql-pega74"
   namespace: "pega74"
   labels:

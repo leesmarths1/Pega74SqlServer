@@ -26,7 +26,7 @@ spec:
       terminationGracePeriodSeconds: 10
       containers:
         - name: "sql-pega74"
-          image: "eu.gcr.io/hs-it-pega-sandbox/sqlsvr1"
+          image: "eu.gcr.io/hs-it-pega-sandbox/sqlsvr1:latest"
           securityContext:
             runAsUser: 0
           ports:
